@@ -71,7 +71,7 @@ def delete_post(request, pk:int):
         'post': post,
     }
 
-    return render(request, 'posts/details-post.html', context)
+    return render(request, 'posts/delete-post.html', context)
 
 
 
