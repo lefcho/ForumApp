@@ -1,12 +1,18 @@
+from django.forms import modelform_factory
 from django.shortcuts import render, redirect
 
-from ForumApp.posts.forms import SearchForm, PostCreateForm, PostDeleteForm, PostEditForm
+from ForumApp.posts.forms import SearchForm, PostCreateForm, PostDeleteForm, PostEditForm, CommentFormSet
 from ForumApp.posts.models import Post
 
 
 def index(request):
+    post_form = modelform_factory(
+        Post,
+        fields=('title', 'content', 'author'),
+    )
+
     context = {
-        'my_form': '',
+        'my_form': post_form,
     }
 
     return render(request, 'common/index.html', context)
@@ -66,9 +72,21 @@ def edit_post(request, pk:int):
 
 def detail_post(request, pk:int):
     post = Post.objects.get(pk=pk)
+    formset = CommentFormSet(request.POST or None)
+
+    if request.method == 'POST':
+        if formset.is_valid():
+            for form in formset:
+                if form.cleaned_data:
+                    comment = form.save(commit=False)
+                    comment.post = post
+                    comment.save()
+
+        return redirect('details-post', pk=post.id)
 
     context = {
         'post': post,
+        'formset': formset,
     }
 
     return render(request, 'posts/details-post.html', context)
