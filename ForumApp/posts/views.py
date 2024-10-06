@@ -36,7 +36,7 @@ def dashboard(request):
 
 
 def add_post(request):
-    form = PostCreateForm(request.POST or None)
+    form = PostCreateForm(request.POST or None, request.FILES or None)
 
     if request.method == 'POST':
         if form.is_valid():
@@ -73,6 +73,7 @@ def edit_post(request, pk:int):
 def detail_post(request, pk:int):
     post = Post.objects.get(pk=pk)
     formset = CommentFormSet(request.POST or None)
+    comments = post.comments.all()
 
     if request.method == 'POST':
         if formset.is_valid():
@@ -87,6 +88,7 @@ def detail_post(request, pk:int):
     context = {
         'post': post,
         'formset': formset,
+        'comments': comments,
     }
 
     return render(request, 'posts/details-post.html', context)
