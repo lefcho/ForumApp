@@ -37,6 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'crispy_forms',
+    'crispy_bootstrap4',
+
+    "ForumApp.posts.apps.PostsConfig",
 ]
 
 MIDDLEWARE = [
@@ -113,10 +118,25 @@ USE_I18N = True
 USE_TZ = True
 
 
+CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap4'
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATICFILES_DIRS = (
+    BASE_DIR / 'static',
+)
+
+MEDIA_URL = 'media/'
+
+MEDIA_ROOT = (
+    BASE_DIR / 'media/',
+)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
