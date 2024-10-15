@@ -171,6 +171,35 @@ def detail_post(request, pk:int):
     return render(request, 'posts/details-post.html', context)
 
 
+# class PostDetailView(DetailView):
+#     model = Post
+#     template_name = 'posts/details-post.html'
+#
+#     def get_context_data(self, **kwargs):
+#         print(PostDetailView.__mro__)
+#         context = super().get_context_data(**kwargs)
+#         context['formset'] = CommentFormSet()
+#         return context
+#
+#     def post(self, request, *args, **kwargs):
+#         post = self.get_object()
+#         formset = CommentFormSet(request.POST)
+#
+#         if formset.is_valid():
+#             for form in formset:
+#                 if form.cleaned_data:
+#                     comment = form.save(commit=False)
+#                     comment.post = post
+#                     comment.save()
+#
+#             return redirect('details-post', pk=post.id)
+#
+#         context = self.get_context_data()
+#         context['formset'] = formset
+#
+#         return self.render_to_response(context)
+
+
 class DeletePostView(DeleteView, FormView):
     model = Post
     template_name = 'posts/delete-post.html'
