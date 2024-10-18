@@ -3,10 +3,12 @@ from datetime import datetime
 from django.forms import modelform_factory
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.utils.decorators import classonlymethod
-from django.views.generic import TemplateView, FormView, ListView, CreateView, UpdateView, DeleteView
+from django.utils.decorators import classonlymethod, method_decorator
+from django.views.generic import TemplateView, FormView, ListView, CreateView, UpdateView, DeleteView, DetailView
 
+from ForumApp.posts.decorators import measure_execution_time
 from ForumApp.posts.forms import SearchForm, PostCreateForm, PostDeleteForm, PostEditForm, CommentFormSet
+from ForumApp.posts.mixins import TimeRestrictionMixin
 from ForumApp.posts.models import Post
 
 
@@ -27,7 +29,8 @@ class BaseView:
             return self.post(request, *args, **kwargs)
 
 
-class IndexView(TemplateView):
+@method_decorator(measure_execution_time, name='dispatch')
+class IndexView(TimeRestrictionMixin, TemplateView):
     # template_name = 'common/index.html'
     # extra_context = {
     #     'static_time': datetime.now()
@@ -66,6 +69,7 @@ class DashboardView(ListView, FormView):
     context_object_name = 'posts'
     form_class = SearchForm
     success_url = reverse_lazy('dashboard')
+    paginate_by = 2
 
     def get_queryset(self):
         queryset = self.model.objects.all()
@@ -147,44 +151,12 @@ class EditPostView(UpdateView):
 #     return render(request, 'posts/edit_post.html', context)
 
 
-def detail_post(request, pk:int):
-    post = Post.objects.get(pk=pk)
-    formset = CommentFormSet(request.POST or None)
-    comments = post.comments.all()
-
-    if request.method == 'POST':
-        if formset.is_valid():
-            for form in formset:
-                if form.cleaned_data:
-                    comment = form.save(commit=False)
-                    comment.post = post
-                    comment.save()
-
-        return redirect('details-post', pk=post.id)
-
-    context = {
-        'post': post,
-        'formset': formset,
-        'comments': comments,
-    }
-
-    return render(request, 'posts/details-post.html', context)
-
-
-# class PostDetailView(DetailView):
-#     model = Post
-#     template_name = 'posts/details-post.html'
+# def detail_post(request, pk:int):
+#     post = Post.objects.get(pk=pk)
+#     formset = CommentFormSet(request.POST or None)
+#     comments = post.comments.all()
 #
-#     def get_context_data(self, **kwargs):
-#         print(PostDetailView.__mro__)
-#         context = super().get_context_data(**kwargs)
-#         context['formset'] = CommentFormSet()
-#         return context
-#
-#     def post(self, request, *args, **kwargs):
-#         post = self.get_object()
-#         formset = CommentFormSet(request.POST)
-#
+#     if request.method == 'POST':
 #         if formset.is_valid():
 #             for form in formset:
 #                 if form.cleaned_data:
@@ -192,12 +164,43 @@ def detail_post(request, pk:int):
 #                     comment.post = post
 #                     comment.save()
 #
-#             return redirect('details-post', pk=post.id)
+#         return redirect('details-post', pk=post.id)
 #
-#         context = self.get_context_data()
-#         context['formset'] = formset
+#     context = {
+#         'post': post,
+#         'formset': formset,
+#         'comments': comments,
+#     }
 #
-#         return self.render_to_response(context)
+#     return render(request, 'posts/details-post.html', context)
+
+
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'posts/details-post.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['formset'] = CommentFormSet()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        post = self.get_object()
+        formset = CommentFormSet(request.POST)
+
+        if formset.is_valid():
+            for form in formset:
+                if form.cleaned_data:
+                    comment = form.save(commit=False)
+                    comment.post = post
+                    comment.save()
+
+            return redirect('details-post', pk=post.id)
+
+        context = self.get_context_data()
+        context['formset'] = formset
+
+        return self.render_to_response(context)
 
 
 class DeletePostView(DeleteView, FormView):

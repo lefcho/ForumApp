@@ -7,7 +7,7 @@ urlpatterns = [
     path('add-post/', views.AddPostView.as_view(), name='add-post'),
     path('<int:pk>/', include([
         path('delete-post/', views.DeletePostView.as_view(), name='delete-post'),
-        path('details-post/', views.detail_post, name='details-post'),
+        path('details-post/', views.PostDetailView.as_view(), name='details-post'),
         path('edit-post/', views.EditPostView.as_view(), name='edit-post'),
     ]))
 ]
