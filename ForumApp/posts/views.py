@@ -8,6 +8,7 @@ from django.views.generic import TemplateView, FormView, ListView, CreateView, U
 
 from ForumApp.posts.decorators import measure_execution_time
 from ForumApp.posts.forms import SearchForm, PostCreateForm, PostDeleteForm, PostEditForm, CommentFormSet
+from ForumApp.posts.mixins import TimeRestrictionMixin
 from ForumApp.posts.models import Post
 
 
@@ -29,7 +30,7 @@ class BaseView:
 
 
 @method_decorator(measure_execution_time, name='dispatch')
-class IndexView(TemplateView):
+class IndexView(TimeRestrictionMixin, TemplateView):
     # template_name = 'common/index.html'
     # extra_context = {
     #     'static_time': datetime.now()
