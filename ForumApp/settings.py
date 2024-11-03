@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap4',
 
     "ForumApp.posts.apps.PostsConfig",
+    "ForumApp.accounts.apps.AccountsConfig"
 ]
 
 MIDDLEWARE = [
