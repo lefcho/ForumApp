@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from ForumApp.accounts.models import CustomUser
+
+
+@admin.register(CustomUser)
+class CustomUserAdmin(admin.ModelAdmin):
+    pass

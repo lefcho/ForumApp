@@ -27,13 +27,13 @@
         <div class="col-md-2 p-3">
             <p>Last refresh: {% current_time '%H:%M' %}</p>
         </div>
+        <div class="col-md-2 p-3 d-flex justify-content-end">
+            {% user_info request.user %}
+        </div>
         <div class="text-center">
             {% block content %}
             {% endblock %}
         </div>
-    </div>
-    <div class="col-md-2 p-3 d-flex justify-content-end">
-       {% user_info request.user %} 
     </div>
 </div>
 
